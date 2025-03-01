@@ -13,5 +13,5 @@ export const useAuth = () => {
     setIsAuthenticated(true);
   }, []);
 
-  return { 'youth', '' };
+  return { user, isAuthenticated };
 };
