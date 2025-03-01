@@ -1,58 +1,58 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, PermissionsAndroid } from 'react-native';
+import Button from '../../components/Button';
+import { useNavigation } from '@react-navigation/native';
+import { callService } from '../../services/callService';
+import { alertService } from '../../services/alertService';
+import { useAuth } from '../../services/authService';
 
-const ElderlyHomeScreen = ({ navigation }) => {
+function ElderlyHomeScreen() {
+  const navigation = useNavigation();
+  const { logout } = useAuth();
+  const [callStatus, setCallStatus] = useState('No active call');
+
+  const requestCallPermission = async () => {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.READ_CALL_LOG,
+      { title: 'Call Log Permission', message: 'Needed for scam detection', buttonPositive: 'OK' }
+    );
+    return granted === PermissionsAndroid.RESULTS.GRANTED;
+  };
+
+  const checkCall = async () => {
+    if (await requestCallPermission()) {
+      const status = await callService.checkCall();
+      setCallStatus(status);
+    } else {
+      setCallStatus('Permission denied');
+    }
+  };
+
+  const sendAlert = async () => {
+    await alertService.sendAlert();
+    navigation.navigate('Emergency');
+  };
+
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.welcomeText}>Welcome to Elderly Assistance App</Text>
-      
-      {/* Section 1: Home & Tutorial Hub */}
-      <View style={styles.section}>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TutorialHubScreen')}>
-          <Text style={styles.buttonText}>Tutorial Hub</Text>
-        </TouchableOpacity>
-      </View>
-      
-      {/* Section 2: Services & Virtual Walking Companion */}
-      <View style={styles.section}>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('GeneralServicesScreen')}>
-          <Text style={styles.buttonText}>Services</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('VirtualWalkingCompanionScreen')}>
-          <Text style={styles.buttonText}>Virtual Walking Companion</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+    <View style={styles.container}>
+      <Text style={styles.title}>Elderly Guard</Text>
+      <Text style={styles.subtitle}>Your Safety Hub</Text>
+      <Text style={styles.status}>Call Status: {callStatus}</Text>
+      <Button title="Check Incoming Call" onPress={checkCall} />
+      <Button title="Send Emergency Alert" color="#ff4444" onPress={sendAlert} />
+      <Button title="Logout" onPress={()=>{
+        logout();
+        navigation.navigate('Auth');
+      }} color="#888" />
+    </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#f5f5f5',
-  },
-  welcomeText: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  section: {
-    marginBottom: 30,
-  },
-  button: {
-    backgroundColor: '#007bff',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  title: { fontSize: 28, fontWeight: 'bold', marginBottom: 10 },
+  subtitle: { fontSize: 18, marginBottom: 20 },
+  status: { fontSize: 16, marginBottom: 20 },
 });
 
 export default ElderlyHomeScreen;

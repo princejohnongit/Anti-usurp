@@ -1,18 +1,34 @@
+/**
+ * SilverSafety App - Compressed Version
+ * Core Safety for Elderly
+ *
+ * @format
+ */
 import React from 'react';
+import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import ElderlyHomeScreen from './src/screens/elderly/ElderlyHomeScreen';
+import AppNavigator from './navigation/AppNavigator';
 
-const Stack = createStackNavigator();
+function App() {
+  const isDarkMode = useColorScheme() === 'dark';
 
-const App = () => {
+  const backgroundStyle = {
+    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+    flex: 1,
+  };
+
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="ElderlyHome">
-        <Stack.Screen name="ElderlyHome" component={ElderlyHomeScreen} options={{ title: 'Elderly Home' }} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <View style={backgroundStyle}>
+      <StatusBar
+        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+        backgroundColor={backgroundStyle.backgroundColor}
+      />
+      <NavigationContainer>
+        <AppNavigator />
+      </NavigationContainer>
+    </View>
   );
-};
+}
 
 export default App;
