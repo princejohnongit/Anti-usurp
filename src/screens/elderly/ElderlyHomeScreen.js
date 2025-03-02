@@ -33,14 +33,22 @@ function ElderlyHomeScreen() {
     navigation.navigate('Emergency');
   };
 
+  const checkFake = async () => {
+    navigation.navigate('DeepFake');
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>SilverSafety</Text>
+      <Text style={styles.title}>Elderly Guard</Text>
       <Text style={styles.subtitle}>Your Safety Hub</Text>
       <Text style={styles.status}>Call Status: {callStatus}</Text>
       <Button title="Check Incoming Call" onPress={checkCall} />
       <Button title="Send Emergency Alert" color="#ff4444" onPress={sendAlert} />
-      <Button title="Logout" onPress={logout} color="#888" />
+      <Button title="Check Fake" color="#88bb44" onPress={checkFake} />
+      <Button title="Logout" onPress={()=>{
+        logout();
+        navigation.navigate('Auth');
+      }} color="#888" />
     </View>
   );
 }

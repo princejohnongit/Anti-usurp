@@ -1,36 +1,45 @@
+// src/screens/youth/YouthHomeScreen.js
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, PermissionsAndroid } from 'react-native';
+import { View, Text, StyleSheet, FlatList } from 'react-native';
 import AlertCard from '../../components/AlertCard';
-import { alertService } from '../../services/alertService';
-import { locationService } from '../../services/locationService';
-import { useAuth } from '../../services/authService';
+import Button from '../../components/Button';
 
-function YouthHomeScreen() {
-  const { logout } = useAuth();
+function YouthHomeScreen({ navigation }) {
   const [tasks, setTasks] = useState([]);
-
-  const requestLocationPermission = async () => {
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      { title: 'Location Permission', message: 'Needed to find nearby tasks', buttonPositive: 'OK' }
-    );
-    return granted === PermissionsAndroid.RESULTS.GRANTED;
-  };
 
   useEffect(() => {
     const fetchTasks = async () => {
-      if (await requestLocationPermission()) {
-        const location = await locationService.getLocation();
-        const nearbyTasks = await alertService.getNearbyTasks(location);
-        setTasks(nearbyTasks);
-      }
+      // Fake data for nearby tasks
+      const jobs = ['Assist', 'Check on', 'Help', 'Support', 'Visit'];
+      const elderlyData = ['Mr. Sharma', 'Mrs. Gupta', 'Mr. Patel', 'Mrs. Singh', 'Mr. Rao'];
+      
+      // Shuffle elderlyData to avoid repetition
+      const shuffleArray = (array) => {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+      };
+      
+      const shuffledElderly = shuffleArray([...elderlyData]);
+      
+      const generateFakeTasks = () => [
+        { id: '1', title: `${jobs[Math.floor(Math.random() * jobs.length)]} ${shuffledElderly[0]}`, distance: `${(Math.random() * 5).toFixed(1)} km` },
+        { id: '2', title: `${jobs[Math.floor(Math.random() * jobs.length)]} ${shuffledElderly[1]}`, distance: `${(Math.random() * 5).toFixed(1)} km` },
+        { id: '3', title: `${jobs[Math.floor(Math.random() * jobs.length)]} ${shuffledElderly[2]}`, distance: `${(Math.random() * 5).toFixed(1)} km` },
+        { id: '4', title: `${jobs[Math.floor(Math.random() * jobs.length)]} ${shuffledElderly[3]}`, distance: `${(Math.random() * 5).toFixed(1)} km` },
+        { id: '5', title: `${jobs[Math.floor(Math.random() * jobs.length)]} ${shuffledElderly[4]}`, distance: `${(Math.random() * 5).toFixed(1)} km` },
+      ];
+      
+      setTasks(generateFakeTasks());
     };
     fetchTasks();
   }, []);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>SilverSafety Youth</Text>
+      <Text style={styles.title}>Elderly Guard : Youth</Text>
       <Text style={styles.subtitle}>Help Nearby Seniors</Text>
       <FlatList
         data={tasks}
@@ -39,7 +48,7 @@ function YouthHomeScreen() {
         )}
         keyExtractor={(item) => item.id}
       />
-      <Button title="Logout" onPress={logout} color="#888" />
+      <Button title="Logout" onPress={() => navigation.navigate('Auth')} color="#888" />
     </View>
   );
 }
